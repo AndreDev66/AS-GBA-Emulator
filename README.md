@@ -114,6 +114,5 @@ La clase `com.example.core.GBACore` actúa como el punto de acceso central:
 - **Desarrollo principal en interfaz: y Mejoras del Núcleo** Andrés Socorro.
 - **Núcleo de emulación:** Motor en C++20 del proyecto RavenEmu, integrado a través del puente JNI (`app/src/main/cpp/ravenemu` y `app/src/main/cpp/asgba_jni.cpp`). El código de RavenEmu se conserva en su mayoría, pero  con múltiples mejoras realizadas por mi.
 
-### Licencia
-
-El tipo de licencia de este repositorio se encuentra actualmente pendiente de definición. Previo a la publicación de la primera versión estable, se incluirán los archivos `LICENSE` y `NOTICE` con la atribución formal y los términos legales de RavenEmu.
+## 📄 Licencia
+Este proyecto está bajo la licencia **GPL-3.0**. Consulta [LICENSE](./LICENSE) y [NOTICE](./NOTICE).
