@@ -673,33 +673,3 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <https://www.gnu.org/licenses/why-not-lgpl.html>.
-
-
-//Español
-
-LICENCIA PÚBLICA GENERAL DE GNU
-
-Versión 3, 29 de junio de 2007
-
-Copyright (C) 2007 Free Software Foundation, Inc. https://fsf.org/
-
-Se permite a cualquier persona copiar y distribuir copias literales de este documento de licencia, pero no se permite modificarlo.
-
-Preámbulo
-La Licencia Pública General de GNU es una licencia libre y de copyleft para software y otros tipos de obras.
-
-Las licencias para la mayoría del software y otras obras prácticas están diseñadas para quitarle la libertad de compartir y modificar las obras. Por el contrario, la Licencia Pública General de GNU tiene como fin garantizar su libertad de compartir y modificar todas las versiones de un programa, para asegurar que siga siendo software libre para todos sus usuarios. Nosotros, la Free Software Foundation, utilizamos la Licencia Pública General de GNU para la mayoría de nuestro software; también se aplica a cualquier otra obra publicada de esta manera por sus autores. Usted también puede aplicarla a sus programas.
-
-Cuando hablamos de software libre, nos referimos a libertad, no a precio. Nuestras Licencias Públicas Generales están diseñadas para asegurar que usted tenga la libertad de distribuir copias de software libre (y cobrar por ellas si lo desea), que reciba el código fuente o pueda obtenerlo si lo desea, que pueda modificar el software o usar fragmentos de él en nuevos programas libres, y que sepa que puede hacer estas cosas.
-
-Para proteger sus derechos, necesitamos evitar que otros le nieguen estos derechos o le pidan que renuncie a ellos. Por lo tanto, usted tiene ciertas responsabilidades si distribuye copias del software, o si lo modifica: responsabilidades de respetar la libertad de los demás.
-
-Por ejemplo, si distribuye copias de dicho programa, ya sea de forma gratuita o a cambio de una tarifa, debe transmitir a los receptores las mismas libertades que usted recibió. Debe asegurarse de que ellos también reciban o puedan obtener el código fuente. Y debe mostrarles estos términos para que conozcan sus derechos.
-
-Los desarrolladores que usan la GNU GPL protegen sus derechos con dos pasos: (1) afirman los derechos de autor sobre el software, y (2) le ofrecen esta Licencia dándole permiso legal para copiarlo, distribuirlo y/o modificarlo.
-
-Para la protección de los desarrolladores y autores, la GPL explica claramente que no existe garantía para este software libre. Por el bien tanto de los usuarios como de los autores, la GPL exige que las versiones modificadas se marquen como alteradas, de modo que sus problemas no se atribuyan erróneamente a los autores de versiones anteriores.
-
-Algunos dispositivos están diseñados para negar a los usuarios el acceso para instalar o ejecutar versiones modificadas del software en su interior, aunque el fabricante sí pueda hacerlo. Esto es fundamentalmente incompatible con el objetivo de proteger la libertad de los usuarios para modificar el software. El patrón sistemático de tal abuso ocurre en el área de productos para uso individual, que es precisamente donde resulta más inaceptable. Por lo tanto, hemos diseñado esta versión de la GPL para prohibir esta práctica en dichos productos. Si tales problemas surgen de manera sustancial en otros dominios, estamos preparados para extender esta disposición a esos dominios en futuras versiones de la GPL, según sea necesario para proteger la libertad de los usuarios.
-
-Finalmente, todo programa se ve amenazado constantemente por las patentes de software. Los Estados no deberían permitir que las patentes restrinjan el desarrollo y uso de software en computadoras de propósito general, pero en aquellos que lo hacen, deseamos evitar el peligro especial de que las
