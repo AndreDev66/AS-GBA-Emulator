@@ -1,0 +1,64 @@
+AS GBA Emulator
+Copyright (C) 2026 AndreDev66
+
+Este programa es software libre: puedes redistribuirlo y/o modificarlo
+bajo los términos de la Licencia Pública General de GNU, tal y como es
+publicada por la Free Software Foundation, ya sea la versión 3 de la
+Licencia, o (a tu elección) cualquier versión posterior.
+
+Este programa se distribuye con la esperanza de que sea útil, pero
+SIN NINGUNA GARANTÍA; ni siquiera la garantía implícita de
+COMERCIABILIDAD o IDONEIDAD PARA UN PROPÓSITO PARTICULAR. Consulta la
+Licencia Pública General de GNU para más detalles.
+
+Deberías haber recibido una copia de la Licencia Pública General de GNU
+junto con este programa. Si no es así, consulta
+<https://www.gnu.org/licenses/>.
+
+---
+
+AVISOS ADICIONALES
+==================
+
+1. BIOS y ROMs
+--------------
+Este proyecto NO incluye, distribuye ni promueve la distribución de:
+  - Archivos de BIOS de Game Boy Advance
+  - ROMs de juegos comerciales
+  - Cualquier otro contenido protegido por derechos de autor
+
+El usuario es el único responsable de obtener estos archivos de forma
+legal. El autor de este emulador no se hace responsable del uso
+indebido del software.
+
+2. Marcas registradas
+---------------------
+"Game Boy", "Game Boy Advance" y "GBA" son marcas registradas de
+Nintendo Co., Ltd. Este proyecto no está afiliado, patrocinado ni
+respaldado por Nintendo. Todas las marcas pertenecen a sus respectivos
+propietarios.
+
+3. Componentes de terceros
+--------------------------
+Este proyecto utiliza las siguientes bibliotecas de terceros:
+
+  - SDL2 (Simple DirectMedia Layer)
+    Licencia: zlib License
+    Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+    https://www.libsdl.org/
+
+  - [ImGui, fmt, spdlog, etc.]
+    Licencia: [tipo de licencia]
+    Copyright (C) [2026] [Andrés Socorro]
+    [https://github.com/AndreDev66/AS-GBA-Emulato]
+
+4. Contribuciones
+-----------------
+Todas las contribuciones al proyecto se consideran licenciadas bajo
+los mismos términos de la GPL-3.0, salvo que se indique lo contrario
+por escrito.
+
+---
+
+Para consultas legales o de licencia, contacta a:
+  AndreDev66 - https://github.com/AndreDev66 
