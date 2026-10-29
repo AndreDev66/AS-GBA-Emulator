@@ -1,0 +1,93 @@
+# CI de AS GBA Emulator: compila el APK de debug y ejecuta los tests
+# unitarios en cada push/PR a main, y deja el APK y los informes de test
+# como artefactos descargables desde la ejecución.
+#
+# Por qué no hace falta aquí el parche ArgWriter
+# (tools/gradle-argwriter-patch): en Linux la codificación NATIVA y
+# file.encoding son UTF-8 desde el principio, así que Gradle escribe los
+# @argfiles de los workers con UTF-8 y el launcher de `java` los lee con
+# UTF-8: no hay cruce de codificaciones que pueda corromper rutas. El
+# problema sólo existe en Windows, donde native.encoding=Cp1252 y
+# file.encoding=UTF-8 no coinciden (y la ruta del perfil lleva acento).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Un solo pipeline por rama: un push nuevo cancela el que esté aún en vuelo,
+# así no se gastan minutos en resultados que ya no representan al código.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      # El checkout va primero: la validación necesita los ficheros del wrapper
+      # en disco para comparar la huella del gradle-wrapper.jar con las
+      # oficiales. Es la primera línea de defensa frente a un PR que intente
+      # sustituir el wrapper por una versión manipulada.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validar el wrapper de Gradle
+        uses: gradle/actions/wrapper-validation@v4
+
+      # JDK 25 = el que exige gradle/gradle-daemon-jvm.properties
+      # (toolchainVersion=25). Instalado de antemano, el criterio del daemon
+      # coincide sin tener que aprovisionar nada por foojay: arranque más
+      # rápido y un punto de fallo de red menos.
+      - name: Instalar JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      # El runner trae el SDK de Android, pero no necesariamente las versiones
+      # EXACTAS que fija el proyecto (ndkVersion y cmake.version en
+      # app/build.gradle.kts). Instalarlas aquí falla temprano y con mensaje
+      # claro, en vez de dejar que AGP intente descargarlas a mitad de build.
+      - name: Instalar NDK y CMake fijados por el proyecto
+        run: sdkmanager "ndk;28.2.13676358" "cmake;3.22.1"
+
+      # Caché de dependencias y de la compilación nativa entre ejecuciones
+      # (el gestor de caché guarda ~/.gradle/caches y hace save/restore).
+      - name: Configurar Gradle con caché
+        uses: gradle/actions/setup-gradle@v4
+
+      # Compila y prueba en un único comando para que el informe de tests
+      # cubra el mismo árbol que produce el APK. Sin google-services.json ni
+      # .env en el repo el build pasa igual (WARN por estrategia del plugin).
+      - name: Compilar APK y ejecutar tests unitarios
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:testDebugUnitTest :app:assembleDebug --console=plain
+
+      - name: Subir APK debug
+        uses: actions/upload-artifact@v4
+        with:
+          name: asgba-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      # Sólo si algo falló: XML de JUnit + informe HTML para ver el fallo sin
+      # tener que reproducir la corrida en local.
+      - name: Subir informes de tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            app/build/test-results/
+            app/build/reports/tests/
+          if-no-files-found: ignore

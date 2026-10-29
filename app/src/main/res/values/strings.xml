@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AS GBA Emulator</string>
+    <string name="about_developer">Desarrollado por Andrés Socorro · Emulación basada en RavenEmu</string>
+    <string name="app_tagline">Emulador Game Boy Advance de alto rendimiento para Android</string>
+</resources>

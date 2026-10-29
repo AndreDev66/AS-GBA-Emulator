@@ -1,0 +1,37 @@
+*.iml
+.gradle
+.kotlin
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.env
+debug.keystore
+
+# ROMs de prueba: material que no va al repositorio
+*.gba
+*.zip
+*.7z
+*.rar
+
+# Artefactos locales de build/sesión y respaldos
+build_err.txt
+install.log
+metadata.json
+*.log
+*.bak
+*.backup
+
+# Binarios de los autotest nativos (se compilan a mano con el clang del NDK)
+app/src/main/cpp/link_bench
+app/src/main/cpp/link_selftest
+app/src/main/cpp/serial_selftest

@@ -1,0 +1,181 @@
+================================================================================
+AS GBA EMULATOR (RAVENEMU) - ESTADO DEL PROYECTO
+Actualizado: 9 de Octubre, 2026
+================================================================================
+
+--------------------------------------------------------------------------------
+FASES COMPLETADAS EN ESTA SESION: REDISEÑO DE LA BIBLIOTECA (A -> D)
+--------------------------------------------------------------------------------
+
+FASE A - MENÚ CONTEXTUAL AL MANTENER PULSADO UNA ROM  [COMPLETADA]
+  - Pulsación larga sobre una tarjeta abre "Editar juego" en vez de un menú con
+    un único botón de eliminar.
+  - Renombrar el juego en la biblioteca sin tocar el archivo: `displayName` en
+    ROMItem, sólo presentación (ruta, CRC y partida guardada intactos).
+  - Portada propia: la imagen elegida se COPIA dentro de filesDir/covers/, no se
+    guarda el Uri del selector (un permiso de lectura sobre un archivo ajeno
+    caduca; la portada de un juego es algo que el usuario eligió para verla
+    siempre). Cero permisos de medios nuevos.
+  - Copia con temporal + renombrado: si la copia falla, la portada anterior
+    sigue puesta en vez de dejar la ficha apuntando a un archivo inexistente.
+  - "Restaurar automática" y "Quitar de la biblioteca" dentro de la misma
+    ventana. El borrado limpia el archivo de portada para no dejar huérfano.
+  - Compatibilidad hacia atrás: una biblioteca guardada antes de estos campos
+    sigue cargando (optString + isNull, nunca getString sobre clave ausente).
+
+FASE B - REDISEÑO VISUAL  [COMPLETADA]
+  - Cuadrícula adaptable (LazyVerticalGrid) en lugar de lista plana.
+  - Tarjetas de cristal: superficie semitransparente, borde blanco tenue, sombra
+    suave y velo de luz sobre la portada.
+  - Fondo en pizarra oscura (#11151F -> SteamBg) con velo del acento elegido por
+    el usuario arriba: cada tema de color tiñe la biblioteca.
+  - Metadatos en píldoras semitransparentes (código de juego y peso).
+  - Buscador flotante con sombra; "Cargar ROM" con degradado de acento y borde
+    que respira.
+  - Tipografía: Inter (SIL OFL) variable empaquetada en res/font, sin Google Fonts
+    ni permisos de red. Los cinco pesos salen de la misma instancia por el eje
+    wght de la fuente.
+  - Barra superior adaptativa: en vertical "Cargar ROM" se queda con su icono
+    para que el nombre de la app se lea entero (antes se recortaba a "...").
+  - Tarjeta con dos formas: cartel (portada arriba) en vertical y tendida
+    (portada a la izquierda) en horizontal, donde 5 columnas de 3:4 dejaban el
+    botón de jugar bajo el pliegue.
+
+FASE C - ANIMACIONES  [COMPLETADA]
+  1. Entrada escalonada al cargar o cambiar de pestaña (fade + slide + escala,
+     retardo 40 ms por tarjeta, acotado a 8 para no esperar en bibliotecas largas).
+  2. Pulsación de tarjeta: escala 0.97, elevación 3->12 dp, borde 9%->30% de
+     alfa y zoom interno 1.07x en la portada, contenido por sus esquinas.
+     (En táctil no hay hover: la pulsación es su equivalente.)
+  3. Botón "Jugar": compresión a 0.92 con resorte muy rígido y resplandor
+     blanco que recorre el botón mientras se mantiene pulsado (en reposo no
+     gasta fotogramas).
+  4. Corazón de favorito: rebote elástico 1.55x -> 1x y anillo rosa que se
+     abre y apaga. Al desmarcar no hay fiesta: vuelve al contorno.
+  5. Pestañas con indicador deslizante por resorte, medido sobre la fila real.
+
+FASE D - INTEGRACIÓN DE LA PORTADA  [COMPLETADA]
+  - Prioridad: portada elegida -> carátula del CDN -> icono de reserva.
+  - El diálogo de edición enseña la portada actual antes de aceptarla.
+
+--------------------------------------------------------------------------------
+AVISO DE ENLACE EN PARTIDA (ajuste pedido tras probar en dispositivo)
+--------------------------------------------------------------------------------
+  - El distintivo de enlace en pantalla completa ya no es texto flotante: es
+    un icono de enlace de 15 dp dentro de un círculo de 30 dp, en verde cuando
+    está enlazado y con un halo que respira despacio (con un icono tan
+    pequeño, un color plano pasaba desapercibido a mitad de partida).
+  - Va DEBAJO del botón L, no en la esquina: los hombros por defecto miden
+    74x34 dp con 24/12 de margen, así que a 24/64 dp el distintivo queda en
+    el hueco libre y ya no lo tapan los controles táctiles en su posición
+    de fábrica.
+  - Sólo aparece si hay algo que avisar (enlazado o esperando). Sin enlace no
+    se dibuja nada: un icono de "sin enlace" en mitad del juego no informa de
+    nada.
+  - Nuevo ajuste "Aviso de enlace en partida" en Ajustes > Pantalla y
+    renderizado, APAGADO por defecto (clave `show_link_badge_fullscreen`).
+    La partida empieza limpia y quien quiera el recordatorio lo enciende.
+  - En vertical (con HUD) el distintivo con texto sigue igual, y ahora sólo
+    aparece cuando hay enlace activo.
+  - 5 pruebas nuevas (LinkBadgeSettingTest): apagado por defecto, ida y vuelta
+    a disco, y que encenderlo no se lleve por delante volumen/acento/FPS.
+
+--------------------------------------------------------------------------------
+CAÍDA DE FOTOGRAMAS EN STREET FIGHTER CON ENLACE (N3)
+--------------------------------------------------------------------------------
+SÍNTOMA
+  Con la sala LAN abierta el juego pasa de 60 fps estables a ~24 de media.
+
+MEDICIÓN EN EL DISPOSITIVO (no fue una suposición)
+  - RTT del móvil al router, medido con ping: 3,8 ms de media (3,1-5,1).
+    Entre dos móviles por ese router, cada intercambio de SIO cuesta del
+    orden de 4-8 ms de reloj REAL, y ese reloj corre dentro del hilo de
+    emulación: el fotograma no puede cerrarse hasta que vuelve la respuesta.
+  - `tests/link_bench.cpp` (banco nuevo): el coste de `service()` en reposo
+    son decenas de microsegundos por fotograma, no de milisegundos. Descartó
+    la culpa del camino por instrucción de CPU: medido ANTES 65,9 us/frame y
+    DESPUÉS 21,7 us/frame con el camino rápido. Es una mejora real, pero sola
+    no explica la caída.
+
+CAUSA
+  El enlace es un ping-pong: cada intercambio es una ida y vuelta por TCP y el
+  hilo de emulación se queda parado esperándola. La fase 0 de una transferencia
+  multiprocesador (el maestro entrega su trama de 18 bits) PEDÍA respuesta para
+  tirar el resultado: media ida y vuelta (~4-8 ms) por transferencia, gratis.
+
+CORRECCIONES
+  1. `LinkEndpoint::push_word` (nuevo, virtual con cuerpo por defecto que
+     devuelve false): entrega la trama sin esperar respuesta. `Serial` lo usa
+     en la fase 0 del modo multiprocesador, con reserva al camino antiguo si el
+     transporte no lo soporta. Las transferencias multiprocesador pasan de
+     2 ida y vuelta a 1.
+  2. Protocolo v2: bit 0x80 en la petición = "no me contestes". El par sigue
+     relojando los bits —lo único que la fase necesita— y se ahorra un
+     paquete y una llamada al sistema por transferencia. La versión sube a 2
+     para que dos APK distintos se rechacen en el saludo en vez de portarse
+     de forma distinta.
+  3. `service()` con camino rápido: una carga atómica relajada y nada más
+     cuando no hay nada encolado (lo llama el planificador una vez por
+     instrucción de CPU). Antes hacía un intercambio atómico secuencialmente
+     consistente y un lock de mutex en cada una.
+  4. Una sola llamada al sistema por trama (cabecera y payload en el mismo
+     buffer) en vez de dos `send`.
+  5. Socket: TCP_QUICKACK (el ping-pong de 9 bytes con el ACK diferido del
+     kernel del par añade decenas de milisegundos), búferes de 256 KB,
+     SO_KEEPALIVE con temporizadores de 1 s.
+  6. Diagnóstico: cada 10 s, una línea en el registro del sistema con los
+     intercambios por segundo, la espera media de cada uno, el peor y cuántos
+     milisegundos por segundo se come la red. Con eso se ve de quién es la
+     culpa (CPU o latencia) sin adivinar:
+         adb logcat -s AsGbaLink
+
+PRÓXIMO PASO PARA EL USUARIO (necesita dos teléfonos)
+  1. Instalar este APK en los dos.
+  2. Enlazar y jugar Street Fighter.
+  3. `adb logcat -s AsGbaLink` mientras se juega.
+  Si la línea dice algo como "120 intercambios/s (6,40 ms de espera cada uno)",
+  el problema es puramente de red: 120 x 6,4 ms = 768 ms de red por segundo, y
+  no hay código que lo arregle. Entonces el camino es bajar la latencia:
+  banda de 5 GHz, sin VPN (una VPN puede sacar el tráfico de la LAN del
+  enlace local) y un router sin ahorro de energía en el Wi-Fi.
+
+--------------------------------------------------------------------------------
+VERIFICACIÓN
+--------------------------------------------------------------------------------
+  - BUILD SUCCESSFUL (assembleDebug + testDebugUnitTest).
+  - 157 pruebas unitarias en 16 suites, 0 fallos (antes 141 en 13).
+      * RomCustomizationTest      (6)  - el nombre propio manda y no toca la ROM
+      * RomLibraryPersistenceTest (5)  - ida y vuelta a disco, y biblioteca vieja
+      * LinkBadgeSettingTest      (5)  - el aviso de enlace se guarda y no arrastra otros ajustes
+  - APK 28.8 MB (antes 28.2; +0.6 por la fuente Inter variable).
+  - Probado en dispositivo (zxww6x7tzlrsbiuo, Android 14 / API 34):
+      * Vertical: 2 columnas de cartel, barra superior completa.
+      * Horizontal: 3 columnas tendidas con el botón "Jugar" a la vista.
+      * Pulsación larga: abre "Editar juego" con nombre, portada y "Quitar".
+      * Aviso de enlace: sala abierta en el puerto 17017 (estado "esperando")
+        y en pantalla completa el icono sale bajo el botón L, sin taparse.
+
+--------------------------------------------------------------------------------
+PENDIENTE
+--------------------------------------------------------------------------------
+  1. SUBIR A GITHUB - pospuesto por decisión del usuario ("No, aún not yet").
+     Todo está commiteado en local; el push lanzaría la primera CI.
+
+  2. PRUEBAS DE ENLACE LAN CON DOS DISPOSITIVOS REALES. La arquitectura está
+     completa y probada contra un peer en PC (tools/link-peer.ps1); falta la
+     prueba de campo con dos teléfonos en la misma red Wi-Fi.
+
+  3. MODOS SIO COMPLEMENTARIOS - UART, General Purpose y JOYBUS siguen como
+     no-op / soporte mínimo en la v1 del enlace (documentado como limitación).
+
+  4. DECISIONES DE DISEÑO TOMADAS (por si hay que revisitarlas):
+     - La portada personalizada se copia dentro de la app en vez de guardarse
+       el Uri del selector: evita el permiso de medios y sobrevive al reinicio.
+     - Inter va empaquetada (+0.6 MB) en vez de seguir con la sans-serif del
+       sistema: es lo que pedía el rediseño, pero se puede revertir borrando
+       `app/src/main/res/font/` y volviendo a FontFamily.SansSerif en Type.kt.
+     - El cristal usa translucidez y no desenfoque real de fondo: el blur de
+       fondo (RenderEffect) sólo existe desde Android 12, y la translucidez da
+       el mismo efecto en todas las versiones soportadas (minSdk 24).
+
+================================================================================
